@@ -40,7 +40,7 @@ export default function connect(mapStateToProps, mapDispatchToProps, mergeProps,
 
   const finalMergeProps = mergeProps || defaultMergeProps
   const checkMergedEquals = finalMergeProps !== defaultMergeProps
-  const { pure = true, withRef = false } = options
+  const { pure = true, withRef = false, storeName = 'store' } = options
 
   // Helps track hot reloading.
   const version = nextVersion++
@@ -64,7 +64,7 @@ export default function connect(mapStateToProps, mapDispatchToProps, mergeProps,
       constructor(props, context) {
         super(props, context)
         this.version = version
-        this.store = props.store || context.store
+        this.store = props.store || context[storeName]
 
         invariant(this.store,
           `Could not find "store" in either the context or ` +
@@ -287,7 +287,7 @@ export default function connect(mapStateToProps, mapDispatchToProps, mergeProps,
     Connect.displayName = `Connect(${getDisplayName(WrappedComponent)})`
     Connect.WrappedComponent = WrappedComponent
     Connect.contextTypes = {
-      store: storeShape
+      [storeName]: storeShape
     }
     Connect.propTypes = {
       store: storeShape

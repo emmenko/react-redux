@@ -21,37 +21,41 @@ function warnAboutReceivingStore() {
   /* eslint-disable no-console */
 }
 
-export default class Provider extends Component {
-  getChildContext() {
-    return { store: this.store }
-  }
+export default function createProvider(storeName = 'store') {
+  class Provider extends Component {
+    getChildContext() {
+      return { [storeName]: this.store }
+    }
 
-  constructor(props, context) {
-    super(props, context)
-    this.store = props.store
-  }
+    constructor(props, context) {
+      super(props, context)
+      this.store = props.store
+    }
 
-  render() {
-    const { children } = this.props
-    return Children.only(children)
-  }
-}
-
-if (process.env.NODE_ENV !== 'production') {
-  Provider.prototype.componentWillReceiveProps = function (nextProps) {
-    const { store } = this
-    const { store: nextStore } = nextProps
-
-    if (store !== nextStore) {
-      warnAboutReceivingStore()
+    render() {
+      const { children } = this.props
+      return Children.only(children)
     }
   }
-}
 
-Provider.propTypes = {
-  store: storeShape.isRequired,
-  children: PropTypes.element.isRequired
-}
-Provider.childContextTypes = {
-  store: storeShape.isRequired
+  if (process.env.NODE_ENV !== 'production') {
+    Provider.prototype.componentWillReceiveProps = function (nextProps) {
+      const { store } = this
+      const { store: nextStore } = nextProps
+
+      if (store !== nextStore) {
+        warnAboutReceivingStore()
+      }
+    }
+  }
+
+  Provider.propTypes = {
+    store: storeShape.isRequired,
+    children: PropTypes.element.isRequired
+  }
+  Provider.childContextTypes = {
+    [storeName]: storeShape.isRequired
+  }
+
+  return Provider
 }
